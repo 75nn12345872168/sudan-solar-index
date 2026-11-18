@@ -1,8 +1,8 @@
-name: Daily Sudan Solar & Starlink Sync
+﻿name: Daily Sudan Solar & Starlink Sync
 
 on:
   schedule:
-    - cron: "0 7 * * *"
+    - cron: "0 */6 * * *"
   workflow_dispatch:
 
 jobs:
@@ -18,7 +18,9 @@ jobs:
           python-version: "3.12"
 
       - name: Install pinned Python dependencies
-        run: pip install -r scripts/requirements.txt
+        run: |
+          pip install -r scripts/requirements.txt
+          pip install requests beautifulsoup4
 
       - name: Run offline unit tests
         run: python -m unittest discover -s scripts
@@ -31,4 +33,6 @@ jobs:
           TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
           SOLAR_SOURCE_URL: ${{ secrets.SOLAR_SOURCE_URL }}
           FX_SOURCE_URL: ${{ secrets.FX_SOURCE_URL }}
-        run: python scripts/solar_sync.py
+        run: |
+          python scripts/solar_sync.py
+          python scripts/scrape_live_listings.py

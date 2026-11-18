@@ -1,11 +1,39 @@
-import { FAQ_ITEMS } from "@/lib/faq-data";
+﻿import { FAQ_ITEMS } from "@/lib/faq-data";
 import { fetchMarketSnapshot } from "@/lib/market-data";
 import { SolarPlatformClient } from "@/components/SolarPlatformClient";
+import LiveListingsSection, { LiveListing } from "@/components/LiveListingsSection";
 
 export const dynamic = "force-dynamic";
 
+async function fetchLiveListings(): Promise<LiveListing[]> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) return [];
+
+  try {
+    const res = await fetch(
+      `${supabaseUrl}/rest/v1/live_listings?select=*&is_active=eq.true&order=last_seen_at.desc&limit=36`,
+      {
+        headers: {
+          apikey: supabaseAnonKey,
+          Authorization: `Bearer ${supabaseAnonKey}`,
+        },
+        cache: "no-store",
+      }
+    );
+    if (!res.ok) return [];
+    return (await res.json()) as LiveListing[];
+  } catch {
+    return [];
+  }
+}
+
 export default async function HomePage() {
-  const snapshot = await fetchMarketSnapshot();
+  const [snapshot, liveListings] = await Promise.all([
+    fetchMarketSnapshot(),
+    fetchLiveListings(),
+  ]);
 
   const faqJsonLd = {
     "@context": "https://schema.org",
@@ -34,6 +62,9 @@ export default async function HomePage() {
         recentObservations={snapshot.recentObservations}
         isSupabaseConnected={snapshot.isSupabaseConnected}
       />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        <LiveListingsSection listings={liveListings} />
+      </div>
     </>
   );
 }
