@@ -239,6 +239,15 @@ export default function LiveListingsSection({
     return `https://wa.me/${item.seller_phone}?text=${encodeURIComponent(message)}`;
   };
 
+  const buildShareWhatsAppUrl = (item: LiveListing) => {
+    const priceText =
+      item.price_sdg && item.price_sdg >= 5000
+        ? `${item.price_sdg.toLocaleString("en-US")} ج.س`
+        : "السعر محدث على المنصة";
+    const text = `شاهد هذا العرض على مرصد الطاقة الشمسية وستارلينك في السودان:\n*${item.title}*\n- المدينة: ${item.city}\n- السعر: ${priceText}\nللتفاصيل والتواصل المباشر مع البائع:\nhttps://sudan-solar-index.vercel.app`;
+    return `https://wa.me/?text=${encodeURIComponent(text)}`;
+  };
+
   const buildComplaintWhatsAppUrl = (item: LiveListing) => {
     const message = `بلاغ / شكوى حول إعلان في منصة مؤشر الطاقة الشمسية:\n- كود الإعلان: ${item.external_id}\n- المنتج: ${item.title}\n- المدينة: ${item.city}\n- سبب البلاغ: (السعر غير مطابق / المنتج مباع / رقم البائع لا يرد)`;
     return `https://wa.me/${COMPLAINTS_WHATSAPP}?text=${encodeURIComponent(message)}`;
@@ -386,14 +395,25 @@ export default function LiveListingsSection({
                   </a>
                 ) : null}
 
-                <a
-                  href={buildComplaintWhatsAppUrl(item)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full inline-flex items-center justify-center gap-1.5 bg-slate-800/80 hover:bg-rose-950/60 text-slate-400 hover:text-rose-300 border border-slate-700/70 text-xs py-2 px-3 rounded-xl transition"
-                >
-                  <span>إبلاغ / شكاوى الأسعار (واتساب الإدارة)</span>
-                </a>
+                <div className="grid grid-cols-2 gap-2">
+                  <a
+                    href={buildShareWhatsAppUrl(item)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-1 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 text-xs font-semibold py-2 px-2 rounded-xl transition"
+                  >
+                    <span>مشاركة العرض (واتساب)</span>
+                  </a>
+
+                  <a
+                    href={buildComplaintWhatsAppUrl(item)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-1 bg-slate-800/80 hover:bg-rose-950/60 text-slate-400 hover:text-rose-300 border border-slate-700/70 text-xs py-2 px-2 rounded-xl transition"
+                  >
+                    <span>إبلاغ / شكوى</span>
+                  </a>
+                </div>
               </div>
             </div>
           ))}
@@ -579,4 +599,5 @@ export default function LiveListingsSection({
     </section>
   );
 }
+
 
