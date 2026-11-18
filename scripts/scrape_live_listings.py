@@ -132,14 +132,23 @@ def sync_to_supabase(records: list[dict]):
     }
     if records:
         res = requests.post(f"{rest_url}?on_conflict=external_id", headers=sb_headers, data=json.dumps(records), timeout=30)
-        res.raise_for_status()
-        print(f"Upserted {len(records)} live listings.")
-    cutoff = (datetime.now(timezone.utc) - timedelta(hours=36)).isoformat()
-    deact = requests.patch(f"{rest_url}?is_direct_partner=eq.false&last_seen_at=lt.{cutoff}", headers=sb_headers, data=json.dumps({"is_active": False}), timeout=20)
-    deact.raise_for_status()
+        if not res.ok:
+            raise RuntimeError(f"Insert failed ({res.status_code}): {res.text}")
+        print(f"Upserted {len(records)} live listings successfully.")
+    cutoff = (datetime.now(timezone.utc) - timedelta(hours=36)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    deact = requests.patch(
+        rest_url,
+        params={"is_direct_partner": "eq.false", "last_seen_at": f"lt.{cutoff}"},
+        headers=sb_headers,
+        data=json.dumps({"is_active": False}),
+        timeout=20,
+    )
+    if not deact.ok:
+        raise RuntimeError(f"Deactivate failed ({deact.status_code}): {deact.text}")
 
 if __name__ == "__main__":
     items = scrape_opensooq()
     print(f"Fetched {len(items)} listings.")
     sync_to_supabase(items)
+
 
