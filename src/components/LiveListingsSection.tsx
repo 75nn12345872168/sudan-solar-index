@@ -349,18 +349,11 @@ export default function LiveListingsSection({
                     {item.title}
                   </h3>
                   <div className="pt-1">
-                    {item.price_sdg ? (
+                    {item.price_sdg && item.price_sdg >= 5000 ? (
                       <p className="text-xl font-extrabold text-amber-400">
                         {item.price_sdg.toLocaleString("en-US")}{" "}
                         <span className="text-xs font-normal text-slate-300">
                           ج.س
-                        </span>
-                      </p>
-                    ) : item.price_usd ? (
-                      <p className="text-xl font-extrabold text-emerald-400">
-                        {item.price_usd.toLocaleString("en-US")}${" "}
-                        <span className="text-xs font-normal text-slate-300">
-                          دولار
                         </span>
                       </p>
                     ) : (
@@ -586,3 +579,4 @@ export default function LiveListingsSection({
     </section>
   );
 }
+
