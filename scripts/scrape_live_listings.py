@@ -138,7 +138,7 @@ def sync_to_supabase(records: list[dict]):
     cutoff = (datetime.now(timezone.utc) - timedelta(hours=36)).strftime("%Y-%m-%dT%H:%M:%SZ")
     deact = requests.patch(
         rest_url,
-        params={"is_direct_partner": "eq.false", "last_seen_at": f"lt.{cutoff}"},
+        params={"source_platform": "eq.OpenSooq", "is_direct_partner": "eq.false", "last_seen_at": f"lt.{cutoff}"},
         headers=sb_headers,
         data=json.dumps({"is_active": False}),
         timeout=20,
@@ -150,5 +150,6 @@ if __name__ == "__main__":
     items = scrape_opensooq()
     print(f"Fetched {len(items)} listings.")
     sync_to_supabase(items)
+
 
 

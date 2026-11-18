@@ -13,7 +13,7 @@ async function fetchLiveListings(): Promise<LiveListing[]> {
 
   try {
     const res = await fetch(
-      `${supabaseUrl}/rest/v1/live_listings?select=*&is_active=eq.true&order=last_seen_at.desc&limit=36`,
+      `${supabaseUrl}/rest/v1/live_listings?select=*&is_active=eq.true&order=last_seen_at.desc&limit=40`,
       {
         headers: {
           apikey: supabaseAnonKey,
@@ -49,11 +49,14 @@ export default async function HomePage() {
   };
 
   return (
-    <>
+    <div className="min-h-screen bg-slate-950">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-2">
+        <LiveListingsSection listings={liveListings} />
+      </div>
       <SolarPlatformClient
         exchangeRate={snapshot.exchangeRate}
         equipment={snapshot.equipment}
@@ -62,9 +65,6 @@ export default async function HomePage() {
         recentObservations={snapshot.recentObservations}
         isSupabaseConnected={snapshot.isSupabaseConnected}
       />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <LiveListingsSection listings={liveListings} />
-      </div>
-    </>
+    </div>
   );
 }
